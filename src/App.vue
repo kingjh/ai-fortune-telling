@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-main class="container">
-      <h1 class="text-center">AI算命</h1>
+      <h1 class="text-center">AI计运</h1>
       <v-textarea v-model="prompt"
         label="请输入性别、出生日期时间、地点"
         placeholder="如'男性，2000年1月1日0时出生于广州'"
