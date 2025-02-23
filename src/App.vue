@@ -77,11 +77,8 @@ const gender = ref('男');
 const genderOptions = ['男', '女'];
 const birthDate = ref(new Date().toISOString().split('T')[0]);
 const birthTime = ref('06:00');
-const dateDialog = ref(false);
-const timeDialog = ref(false);
 const selectedProvince = ref('广东');
 const selectedCity = ref('广州');
-const cities = ['北京', '上海', '广州', '深圳', '成都', '重庆', '武汉', '杭州'];
 
 const formattedDateTime = computed(() => {
   if (!birthDate.value) return '';
@@ -107,8 +104,8 @@ const conclude = async () => {
     const response = await axios.post(
       'https://dsai.cfworker.cfd/',
       {
-        // 4个网站：deepseek, siliconFlow, nvidia, fireworks
-        site: 'fireworks',
+        // 5个网站：deepseek, siliconFlow, nvidia, fireworks，huoshan
+        site: 'huoshan',
         temperature: 0,
         top_p: 0.1,
         messages: [
