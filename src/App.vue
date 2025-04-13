@@ -7,16 +7,16 @@
         v-model="gender"
         :items="genderOptions"
         label="性别"
-        class="mb-4"
+        class="mb-2"
       ></v-select>
 
-      <v-row>
+      <v-row no-gutters>
         <v-col>
           <v-select
             v-model="selectedProvince"
             :items="provinces"
             label="省份"
-            class="mb-4"
+            class="mb-2"
             @update:model-value="handleProvinceChange"
           ></v-select>
         </v-col>
@@ -25,22 +25,24 @@
             v-model="selectedCity"
             :items="availableCities"
             label="城市"
-            class="mb-4"
+            class="mb-2"
             :disabled="!selectedProvince"
           ></v-select>
         </v-col>
       </v-row>
 
-      <v-row>
+      <v-row no-gutters>
         <v-col>
           <v-text-field
             class="date-field-wrapper"
             :model-value="formattedDisplayDateTime"
             label="出生日期和时间"
             readonly
+            @click="openDatePicker"
           >
             <template #append-inner>
               <date-picker
+                ref="datepickerRef"
                 v-model="date"
                 locale="zh"
                 :format="format"
@@ -81,7 +83,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import { VApp, VMain, VFileInput, VTextarea, VBtn, VImg, VDialog, VCard } from 'vuetify/components';
 // 导入Vue-Datepicker组件
@@ -90,14 +92,19 @@ import '@vuepic/vue-datepicker/dist/main.css';
 
 const gender = ref('男');
 const genderOptions = ['男', '女'];
-const date = ref(new Date());
-const isDatePickerOpen = ref(false); // 跟踪日期选择器是否打开
-const debugMode = ref(true); // 开启调试模式
+const date = ref(new Date(1990, 0, 1)); // 设置为1990年1月1日
+const isDatePickerOpen = ref(false);
+const debugMode = ref(false);
+const datepickerRef = ref(null);
 
 const timePickerProps = {
   format: '24',
   is24: true,
   minuteIncrement: 1
+};
+
+const openDatePicker = () => {
+  datepickerRef.value.openMenu();
 };
 
 const handleDatePickerOpen = () => {
@@ -329,5 +336,10 @@ const handleProvinceChange = () => {
 /* 减少日期选择器toggle宽度 */
 :deep(.dp__input_icon_pad) {
   padding: 10px 20px;
+}
+
+/* 让文本字段可点击 */
+.date-field-wrapper {
+  cursor: pointer;
 }
 </style>
