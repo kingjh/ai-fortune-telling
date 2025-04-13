@@ -12,24 +12,6 @@
 
       <v-row>
         <v-col>
-          <v-text-field
-            v-model="birthDate"
-            type="date"
-            label="出生日期"
-            :max="new Date().toISOString().split('T')[0]"
-          ></v-text-field>
-        </v-col>
-        <v-col>
-          <v-text-field
-            v-model="birthTime"
-            type="time"
-            label="出生时间"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-
-      <v-row>
-        <v-col>
           <v-select
             v-model="selectedProvince"
             :items="provinces"
@@ -49,8 +31,38 @@
         </v-col>
       </v-row>
 
+      <v-row>
+        <v-col>
+          <v-text-field
+            class="date-field-wrapper"
+            :model-value="formattedDisplayDateTime"
+            label="出生日期和时间"
+            readonly
+          >
+            <template #append-inner>
+              <date-picker
+                v-model="date"
+                locale="zh"
+                :format="format"
+                hide-input
+                enable-timepicker
+                time-picker-inline
+                :time-picker-props="timePickerProps"
+                auto-apply
+                :clearable="false"
+                @open="handleDatePickerOpen"
+                @closed="handleDatePickerClosed"
+                @update:model-value="handleDateUpdate"
+                year-first
+              />
+            </template>
+          </v-text-field>
+        </v-col>
+      </v-row>
+
       <div>
         <v-btn
+            v-if="!isDatePickerOpen"
             color="primary"
             @click="generateConclusion"
             :disabled="loading"
@@ -72,22 +84,71 @@
 import { ref, computed } from 'vue';
 import axios from 'axios';
 import { VApp, VMain, VFileInput, VTextarea, VBtn, VImg, VDialog, VCard } from 'vuetify/components';
+// 导入Vue-Datepicker组件
+import DatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 const gender = ref('男');
 const genderOptions = ['男', '女'];
-const birthDate = ref(new Date().toISOString().split('T')[0]);
-const birthTime = ref('06:00');
+const date = ref(new Date());
+const isDatePickerOpen = ref(false); // 跟踪日期选择器是否打开
+const debugMode = ref(true); // 开启调试模式
+
+const timePickerProps = {
+  format: '24',
+  is24: true,
+  minuteIncrement: 1
+};
+
+const handleDatePickerOpen = () => {
+  console.log('日期选择器打开');
+  isDatePickerOpen.value = true;
+};
+
+const handleDatePickerClosed = () => {
+  console.log('日期选择器关闭');
+  isDatePickerOpen.value = false;
+};
+
+const handleDateUpdate = (val) => {
+  console.log('日期更新', val);
+};
+
+const format = (date) => {
+  if (!date) return '';
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+};
+
+const formattedDisplayDateTime = computed(() => {
+  if (!date.value) return '';
+  const year = date.value.getFullYear();
+  const month = date.value.getMonth() + 1;
+  const day = date.value.getDate();
+  const hours = date.value.getHours().toString().padStart(2, '0');
+  const minutes = date.value.getMinutes().toString().padStart(2, '0');
+  return `${year}年${month}月${day}日 ${hours}:${minutes}`;
+});
+
+const formattedDateTime = computed(() => {
+  if (!date.value) return '';
+  const year = date.value.getFullYear();
+  const month = date.value.getMonth() + 1;
+  const day = date.value.getDate();
+  const hours = date.value.getHours().toString().padStart(2, '0');
+  const minutes = date.value.getMinutes().toString().padStart(2, '0');
+  return `${year}年${month}月${day}日 ${hours}:${minutes}`;
+});
+
 const selectedProvince = ref('广东');
 const selectedCity = ref('广州');
 
-const formattedDateTime = computed(() => {
-  if (!birthDate.value) return '';
-  const [year, month, day] = birthDate.value.split('-');
-  return `${year}年${month}月${day}日`;
-});
-
 const prompt = computed(() => {
-  return `${gender.value}性，${formattedDateTime.value}${birthTime.value}时出生于${selectedCity.value}`;
+  return `${gender.value}性，${formattedDateTime.value}出生于${selectedCity.value}`;
 });
 
 const conclusion = ref('');
@@ -254,5 +315,19 @@ const handleProvinceChange = () => {
   position: absolute;
   top: 10px;
   right: 10px;
+}
+
+:deep(.date-field-wrapper) .dp__main {
+  width: auto;
+  margin-top: -8px;
+}
+
+:deep(.date-field-wrapper) .dp__button {
+  margin-right: -8px;
+}
+
+/* 减少日期选择器toggle宽度 */
+:deep(.dp__input_icon_pad) {
+  padding: 10px 20px;
 }
 </style>

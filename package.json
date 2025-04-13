@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.2.1",
+    "@vuepic/vue-datepicker": "^11.0.2",
     "axios": "^1.6.7",
     "vue": "^3.4.15",
     "vuetify": "^3.6.5"
